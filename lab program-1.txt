@@ -1,0 +1,105 @@
+1.Write a JDBC application which will interact with Database and perform the following task. 
+a.Create Student Table with RollNo, Name, and Address field and insert few records. 
+b.Using Statement Object display the content of Record. 
+c.Using Statement Object Insert Two Record. 
+d.Using Statement Object Update One Record. 
+e.Using Statement Object Delete One Record. 
+f.Using Statement Object display the content of Record.
+
+
+import java.sql.*;
+
+public class StudentJDBCApp 
+{
+
+    public static void main(String[] args) 
+{
+        String url = "jdbc:mysql://localhost:3306/testdb?";
+        String user = "testuser";
+        String password = "testpass"; 
+
+        try {
+            // Load MySQL JDBC Driver
+
+            Class.forName("com.mysql.cj.jdbc.Driver");
+
+            // Establish Connection
+            Connection con = DriverManager.getConnection(url, user, password);
+            Statement stmt = con.createStatement();
+
+            // a. Create table
+            String createTable = "CREATE TABLE IF NOT EXISTS Student ("
+                               + "RollNo INT PRIMARY KEY, "
+                               + "Name VARCHAR(50), "
+                               + "Address VARCHAR(100))";
+            stmt.executeUpdate(createTable);
+            System.out.println("Table created successfully.");
+
+            // Insert few records
+            stmt.executeUpdate("INSERT INTO Student VALUES (1, 'Ravi', 'Hyderabad')");
+            stmt.executeUpdate("INSERT INTO Student VALUES (2, 'Sita', 'Chennai')");
+            stmt.executeUpdate("INSERT INTO Student VALUES (3, 'Kiran', 'Bangalore')");
+            System.out.println("Initial records inserted.");
+
+            // b. Display records
+            System.out.println("\nInitial Records:");
+            displayRecords(stmt);
+
+            // c. Insert 2 new records
+            stmt.executeUpdate("INSERT INTO Student VALUES (4, 'Meena', 'Pune')");
+            stmt.executeUpdate("INSERT INTO Student VALUES (5, 'Ramesh', 'Mumbai')");
+            System.out.println("\nTwo new records inserted.");
+
+            // d. Update one record
+           stmt.executeUpdate("UPDATE Student SET Address = 'Delhi' WHERE RollNo = 2");
+           System.out.println("One record updated.");
+
+            // e. Delete one record
+            stmt.executeUpdate("DELETE FROM Student WHERE RollNo = 3");
+            System.out.println("One record deleted.");
+
+            // f. Display updated records
+            System.out.println("\nFinal Records:");
+            displayRecords(stmt);
+
+            // Close connection
+            con.close();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+    // Function to display records
+    public static void displayRecords(Statement stmt) throws SQLException {
+        ResultSet rs = stmt.executeQuery("SELECT * FROM Student");
+        System.out.println("RollNo\tName\tAddress");
+        while (rs.next()) {
+            int roll = rs.getInt("RollNo");
+            String name = rs.getString("Name");
+            String address = rs.getString("Address");
+            System.out.println(roll + "\t" + name + "\t" + address);
+        }
+    }
+}
+
+
+Output:
+             Table created successfully.
+Initial records inserted.
+
+Initial Records:
+RollNo  Name    Address
+1       Ravi    Hyderabad
+2       Sita    Chennai
+3       Kiran   Bangalore
+
+Two new records inserted.
+One record updated.
+One record deleted.
+
+Final Records:
+RollNo  Name    Address
+1       Ravi    Hyderabad
+2       Sita    Delhi
+4       Meena   Pune
+5       Ramesh  Mumbai
